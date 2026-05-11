@@ -45,10 +45,7 @@ public class VikingDesktopFrame extends JFrame {
         });
 
         JButton statsBtn = new JButton("Statistics");
-        statsBtn.addActionListener(e -> {
-            String result = analyzer.getVikingsWithLegendaryEquipment().toString();
-            JOptionPane.showMessageDialog(this, result, "Analyzer", JOptionPane.INFORMATION_MESSAGE);
-        });
+        statsBtn.addActionListener(e -> showStatisticsDialog());
 
         JPanel bottomPanel = new JPanel();
         bottomPanel.add(createButton);
@@ -73,6 +70,44 @@ public class VikingDesktopFrame extends JFrame {
             for (Viking viking : all) {
                 tableModel.addViking(viking);
             }
+        }
+    }
+
+    private void showStatisticsDialog() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        ButtonGroup group = new ButtonGroup();
+        JRadioButton opt1 = new JRadioButton("Легендарное снаряжение", true);
+        JRadioButton opt2 = new JRadioButton("Максимальный ID");
+        JRadioButton opt3 = new JRadioButton("Четные ID");
+        JRadioButton opt4 = new JRadioButton("Случайный великан (>180см)");
+        JRadioButton opt5 = new JRadioButton("Кол-во викингов старше 40");
+
+        group.add(opt1);
+        group.add(opt2);
+        group.add(opt3);
+        group.add(opt4);
+        group.add(opt5);
+
+        panel.add(new JLabel("Выберите тип анализа:"));
+        panel.add(opt1); panel.add(opt2); panel.add(opt3); panel.add(opt4); panel.add(opt5);
+
+        int result = JOptionPane.showConfirmDialog(this, panel, "Аналитика поселения", JOptionPane.OK_CANCEL_OPTION);
+
+        if (result == JOptionPane.OK_OPTION) {
+            String output = "";
+            if (opt1.isSelected()) {
+                output = "Викинги с легендарной техники: " + analyzer.getVikingsWithLegendaryEquipment().stream().map(Viking::name).toList();
+            } else if (opt2.isSelected()) {
+                output = "Максимальный ID: " + analyzer.getMaxId().orElse(0);
+            } else if (opt3.isSelected()) {
+                output = "Список четных ID: " + analyzer.getEvenIds();
+            } else if (opt4.isSelected()) {
+                output = analyzer.getRandomTallViking().map(v -> "Наш викинг: " + v.name() + " (" + v.heightCm() + " см)").orElse("Викинги не найдены");
+            } else if (opt5.isSelected()) {
+                output = "Викингов старше 40 лет: " + analyzer.countVikingsOlderThan(40);
+            }
+            JOptionPane.showMessageDialog(this, output, "Результат анализа", JOptionPane.INFORMATION_MESSAGE);
         }
     }
 }
