@@ -2,14 +2,9 @@ package ru.mephi.vikingdemo.gui;
 
 import ru.mephi.vikingdemo.model.Viking;
 import ru.mephi.vikingdemo.service.VikingService;
+import ru.mephi.vikingdemo.service.VikingServiceAnalyzer;
 
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.SwingConstants;
+import javax.swing.*;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -19,10 +14,12 @@ import java.util.List;
 public class VikingDesktopFrame extends JFrame {
 
     private final VikingService vikingService;
+    private final VikingServiceAnalyzer analyzer;
     private final VikingTableModel tableModel = new VikingTableModel();
 
-    public VikingDesktopFrame(VikingService vikingService) {
+    public VikingDesktopFrame(VikingService vikingService, VikingServiceAnalyzer analyzer) {
         this.vikingService = vikingService;
+        this.analyzer = analyzer;
 
         setTitle("Viking Demo");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -41,10 +38,23 @@ public class VikingDesktopFrame extends JFrame {
         JButton createButton = new JButton("Create random viking");
         createButton.addActionListener(event -> onCreateViking());
 
+        JButton createBtn = new JButton("Create many viking");
+        createBtn.addActionListener(e -> {
+            List<Viking> army = vikingService.generateManyRandomVikings(100);
+            army.forEach(tableModel::addViking);
+        });
+
+        JButton statsBtn = new JButton("Statistics");
+        statsBtn.addActionListener(e -> {
+            String result = analyzer.getVikingsWithLegendaryEquipment().toString();
+            JOptionPane.showMessageDialog(this, result, "Analyzer", JOptionPane.INFORMATION_MESSAGE);
+        });
+
         JPanel bottomPanel = new JPanel();
         bottomPanel.add(createButton);
         add(bottomPanel, BorderLayout.SOUTH);
-        
+        bottomPanel.add(createBtn);
+        bottomPanel.add(statsBtn);
         onInit();
     }
 
@@ -52,7 +62,7 @@ public class VikingDesktopFrame extends JFrame {
         Viking viking = vikingService.createRandomViking();
         tableModel.addViking(viking);
     }
-    
+
     public void addNewViking(Viking viking){
         tableModel.addViking(viking);
     }

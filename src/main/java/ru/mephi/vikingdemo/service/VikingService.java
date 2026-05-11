@@ -3,6 +3,7 @@ package ru.mephi.vikingdemo.service;
 import org.springframework.stereotype.Service;
 import ru.mephi.vikingdemo.model.Viking;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,5 +36,11 @@ public class VikingService {
     }
     public void deleteById(int id) {
         vikingStorage.deleteById(id);
+    }
+
+    public List<Viking> generateManyRandomVikings(int count) {
+        ArrayList<Viking> newVikings = vikingFactory.createRandomVikingMany(count);
+        newVikings.forEach(vikingStorage::save);
+        return newVikings;
     }
 }

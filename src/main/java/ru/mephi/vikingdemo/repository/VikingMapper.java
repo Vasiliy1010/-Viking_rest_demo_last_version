@@ -45,6 +45,7 @@ public class VikingMapper {
                 .toList();
 
         return new Viking(
+                entity.id(),
                 entity.name(),
                 entity.age(),
                 entity.heightCm(),
